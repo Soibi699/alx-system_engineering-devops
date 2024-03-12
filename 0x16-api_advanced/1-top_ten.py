@@ -1,23 +1,27 @@
 #!/usr/bin/python3
-"""Script that prints out top ten hottest gists
-of a subreddit"""
+"""Module that prints title of hot subbreddit"""
 
 import requests
 
 
 def top_ten(subreddit):
-    """Function that fetches top 10 gists"""
-    apiUrl = "https://reddit.com/r/{}/hot.json".format(subreddit)
-    userAgent = "Mozilla/5.0"
-    limits = 10
+    """Takes in a subreddit and prints the top hot"""
+    url = f'https://www.reddit.com/r/{subreddit}/hot.json'
+    params = {'limit': 10}
+    header = {'User-agent': 'Chrome'}
+    try:
+        response = requests.get(url, headers=header, params=params)
+        response.raise_for_status()
 
-    response = requests.get(
-        apiUrl, headers={"user-agent": userAgent}, params={"limit": limits})
-    if not response:
-        print('None')
-        return
-    response = response.json()
-    list_obj = response['data']['children']
-    for obj in list_obj:
-        print(obj['data']['title'])
-    return
+        data = response.json()
+        posts = data["data"]["children"]
+
+        if not posts:
+            print("None")
+        else:
+            for post in posts:
+                title = post["data"]["title"]
+                print(title)
+
+    except requests.exceptions.RequestException:
+        print("None")
